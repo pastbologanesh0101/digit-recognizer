@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+*.egg-info/
+
+# Note: model.joblib is intentionally NOT ignored. It's small (<1MB, since
+# load_digits is only 8x8 images with a tiny SVM) so it's committed directly
+# for convenience -- see README for details.
