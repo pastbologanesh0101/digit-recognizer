@@ -1,5 +1,8 @@
 # AI Handwriting Recognition
 
+[![Tests](https://github.com/pastbologanesh0101/digit-recognizer/actions/workflows/tests.yml/badge.svg)](https://github.com/pastbologanesh0101/digit-recognizer/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A small, self-contained handwritten digit classifier built with scikit-learn.
 It trains a Support Vector Machine (SVM) on the `load_digits` dataset that
 ships with scikit-learn (1,797 samples of 8x8 grayscale images of digits
@@ -8,6 +11,19 @@ individual test samples from the command line.
 
 No external data download is required — `load_digits` is bundled with
 scikit-learn.
+
+## Table of contents
+
+- [What it does](#what-it-does)
+- [How the model works](#how-the-model-works)
+- [Example output](#example-output)
+- [How to run](#how-to-run)
+- [Running the tests](#running-the-tests)
+- [Project structure](#project-structure)
+- [Troubleshooting / FAQ](#troubleshooting--faq)
+- [Note on the committed model file](#note-on-the-committed-model-file)
+- [Tech stack](#tech-stack)
+- [License](#license)
 
 ## What it does
 
@@ -18,6 +34,24 @@ scikit-learn.
 - `predict.py <index>` loads the saved model and test split, runs a
   prediction on the sample at `<index>`, and prints the predicted digit next
   to the actual (ground-truth) digit.
+
+## How the model works
+
+The classifier is a Support Vector Machine (`sklearn.svm.SVC`) with an RBF
+(radial basis function) kernel, `gamma=0.001`, and `C=10`. Each 8x8
+grayscale digit image is treated as a flat 64-dimensional feature vector
+(one feature per pixel intensity, 0-16). The RBF kernel implicitly maps
+these 64-dimensional vectors into a much higher-dimensional space where
+digits of the same class tend to become linearly separable, without ever
+computing that mapping explicitly — this is the "kernel trick" that makes
+SVMs effective on relatively small, low-dimensional datasets like this
+one. `gamma` controls how far the influence of a single training example
+reaches (lower = smoother, more global decision boundaries), and `C`
+controls the tradeoff between a wider margin and fewer misclassified
+training points. These two hyperparameters were left at commonly-used
+defaults for this dataset rather than tuned via grid search, since the
+dataset is small and clean enough that accuracy is already consistently
+above 95% without tuning.
 
 ## Example output
 
