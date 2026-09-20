@@ -2,14 +2,20 @@
 predict.py - Predict a digit from the held-out test set using the saved model.
 
 Usage:
-    python predict.py <index>
+    python predict.py <index> [--model-path PATH]
 
 <index> is an index into the test split that was saved by train.py
 (0 <= index < len(X_test)). Prints the predicted digit and the actual digit.
+
+--model-path/-m lets you point at a model file other than the default
+model.joblib -- e.g. to compare predictions across a couple of retrained
+models saved under different names.
 """
 
-import sys
+import argparse
 import os
+import sys
+
 import joblib
 
 MODEL_PATH = "model.joblib"
@@ -57,19 +63,29 @@ def predict(index, data=None):
     return predicted, actual
 
 
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Predict a digit from the held-out test set."
+    )
+    parser.add_argument(
+        "index",
+        type=int,
+        help="Index into the saved test split (0 <= index < len(X_test)).",
+    )
+    parser.add_argument(
+        "-m",
+        "--model-path",
+        default=MODEL_PATH,
+        help=f"Path to the saved model file (default: {MODEL_PATH}).",
+    )
+    return parser.parse_args(argv)
+
+
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python predict.py <index>")
-        sys.exit(1)
+    args = parse_args()
 
     try:
-        index = int(sys.argv[1])
-    except ValueError:
-        print("Error: <index> must be an integer.")
-        sys.exit(1)
-
-    try:
-        predicted, actual = predict(index)
+        predicted, actual = predict(args.index, data=load_model(args.model_path))
     except (FileNotFoundError, IndexError, ValueError) as exc:
         print(f"Error: {exc}")
         sys.exit(1)

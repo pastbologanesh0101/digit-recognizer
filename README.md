@@ -57,11 +57,18 @@ python train.py
 # 4. Predict on a held-out test sample by index
 python predict.py 0
 python predict.py 42
+
+# Optional: point at a model file other than the default model.joblib
+python predict.py 0 --model-path other_model.joblib
 ```
 
 Valid indices for `predict.py` range from `0` to `len(X_test) - 1` (about
 359 samples with the default 80/20 split of the 1,797-sample dataset).
 Passing an out-of-range index prints a clear error instead of crashing.
+
+`predict.py` also accepts `-m`/`--model-path` to load a model from a path
+other than `model.joblib` — handy if you've saved a few retrained models
+under different names and want to compare their predictions.
 
 ## Running the tests
 

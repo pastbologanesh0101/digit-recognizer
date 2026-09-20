@@ -6,6 +6,7 @@ Run with:
 """
 
 import os
+import shutil
 import sys
 
 import pytest
@@ -13,7 +14,7 @@ import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from train import train_and_evaluate, MODEL_PATH
-from predict import predict, load_model
+from predict import predict, load_model, parse_args
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -104,3 +105,30 @@ def test_predict_malformed_data_raises_clear_error():
     ValueError instead of an opaque KeyError deep inside predict()."""
     with pytest.raises(ValueError, match="train.py"):
         predict(0, data={"unexpected": "structure"})
+
+
+def test_parse_args_defaults_to_model_path():
+    args = parse_args(["7"])
+    assert args.index == 7
+    assert args.model_path == MODEL_PATH
+
+
+def test_parse_args_accepts_model_path_override():
+    args = parse_args(["3", "--model-path", "other.joblib"])
+    assert args.index == 3
+    assert args.model_path == "other.joblib"
+
+    short_flag_args = parse_args(["3", "-m", "other.joblib"])
+    assert short_flag_args.model_path == "other.joblib"
+
+
+def test_predict_with_custom_model_path(tmp_path):
+    """--model-path should let predict.py load a model saved under a
+    different filename, not just the default model.joblib."""
+    custom_path = tmp_path / "custom_model.joblib"
+    shutil.copy(MODEL_PATH, custom_path)
+
+    args = parse_args(["0", "--model-path", str(custom_path)])
+    predicted, actual = predict(args.index, data=load_model(args.model_path))
+    assert 0 <= predicted <= 9
+    assert 0 <= actual <= 9
