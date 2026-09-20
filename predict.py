@@ -32,6 +32,15 @@ def predict(index, data=None):
     if data is None:
         data = load_model()
 
+    required_keys = {"model", "X_test", "y_test"}
+    if not isinstance(data, dict) or not required_keys.issubset(data):
+        raise ValueError(
+            "model.joblib is missing expected data (model/X_test/y_test). "
+            "It may be corrupted, truncated, or saved by an incompatible "
+            "version of this project -- try re-running 'python train.py' "
+            "to regenerate it."
+        )
+
     model = data["model"]
     X_test = data["X_test"]
     y_test = data["y_test"]
@@ -61,7 +70,7 @@ def main():
 
     try:
         predicted, actual = predict(index)
-    except (FileNotFoundError, IndexError) as exc:
+    except (FileNotFoundError, IndexError, ValueError) as exc:
         print(f"Error: {exc}")
         sys.exit(1)
 

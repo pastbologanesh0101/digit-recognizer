@@ -96,3 +96,11 @@ def test_load_model_missing_file_raises_clear_error():
 
     # The message should point the user at the fix, not just say "not found".
     assert "train.py" in str(exc_info.value)
+
+
+def test_predict_malformed_data_raises_clear_error():
+    """A model.joblib that doesn't contain the expected keys (e.g. saved by
+    an incompatible version, or corrupted) should fail with a clear
+    ValueError instead of an opaque KeyError deep inside predict()."""
+    with pytest.raises(ValueError, match="train.py"):
+        predict(0, data={"unexpected": "structure"})
