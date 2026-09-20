@@ -96,6 +96,36 @@ digit-recognizer/
 └── README.md
 ```
 
+## Troubleshooting / FAQ
+
+**`predict.py` says "Could not find 'model.joblib'"**
+`model.joblib` is committed to the repo, so this normally only happens if
+you deleted it, cloned a fork/branch where it's missing, or ran
+`predict.py` from a different working directory than the repo root (it's
+looked up as the relative path `model.joblib`). Run `python train.py` from
+the repo root to regenerate it.
+
+**Why does accuracy vary slightly between runs of `train.py`?**
+The train/test split uses a fixed `random_state=42`, so the split itself is
+deterministic. Small accuracy differences (typically well under 1%) can
+still show up across different scikit-learn or BLAS/OpenMP library
+versions, since `SVC`'s underlying `libsvm` solver isn't guaranteed to be
+bit-for-bit identical across builds. Accuracy should always land above
+95% with the default settings regardless.
+
+**Why is `model.joblib` committed to git instead of `.gitignore`d?**
+Most ML projects gitignore trained models because they're large. This one
+doesn't, on purpose: `load_digits` images are only 8x8 pixels and the
+resulting `SVC` model is small, so `model.joblib` is well under 1MB. See
+"Note on the committed model file" below for details.
+
+**I passed an out-of-range or negative index to `predict.py` — why the error?**
+`predict.py <index>` only accepts indices into the held-out test split
+saved by `train.py` (`0` to `len(X_test) - 1`, about 359 values by
+default). Negative indices are rejected explicitly rather than falling
+back to Python's "wrap to the end of the list" behavior, since that could
+silently return a misleading prediction instead of a clear error.
+
 ## Note on the committed model file
 
 `model.joblib` is committed directly to the repository rather than
