@@ -15,13 +15,14 @@ models saved under different names.
 import argparse
 import os
 import sys
+from typing import Optional
 
 import joblib
 
 MODEL_PATH = "model.joblib"
 
 
-def load_model(path=MODEL_PATH):
+def load_model(path: str = MODEL_PATH) -> dict:
     if not os.path.exists(path):
         raise FileNotFoundError(
             f"Could not find '{path}'. Run 'python train.py' first to train "
@@ -30,7 +31,7 @@ def load_model(path=MODEL_PATH):
     return joblib.load(path)
 
 
-def predict(index, data=None):
+def predict(index: int, data: Optional[dict] = None) -> tuple[int, int]:
     """Predict the digit at `index` in the saved test split.
 
     Returns (predicted_digit, actual_digit).
@@ -63,7 +64,7 @@ def predict(index, data=None):
     return predicted, actual
 
 
-def parse_args(argv=None):
+def parse_args(argv: Optional[list] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Predict a digit from the held-out test set."
     )
@@ -81,7 +82,7 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def main():
+def main() -> None:
     args = parse_args()
 
     try:

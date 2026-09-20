@@ -11,7 +11,6 @@ accuracy, and saves both the trained model and the test split to disk
 """
 
 import joblib
-import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -21,7 +20,11 @@ MODEL_PATH = "model.joblib"
 RANDOM_STATE = 42
 
 
-def train_and_evaluate():
+def train_and_evaluate() -> float:
+    """Train the SVM classifier, evaluate it, and save it to MODEL_PATH.
+
+    Returns the test-set accuracy as a float in [0, 1].
+    """
     digits = load_digits()
     X, y = digits.data, digits.target
 
