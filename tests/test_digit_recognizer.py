@@ -68,3 +68,31 @@ def test_predict_matches_actual_most_of_the_time():
         if predicted == actual:
             matches += 1
     assert matches / sample_size > 0.8
+
+
+def test_predict_negative_index_raises():
+    """Negative indices must be rejected explicitly.
+
+    Plain Python list/array indexing treats -1 as "last element", which
+    would silently return a real (misleading) prediction instead of an
+    error. predict() explicitly disallows negative indices, so this should
+    raise IndexError rather than quietly returning a result.
+    """
+    data = load_model()
+    with pytest.raises(IndexError):
+        predict(-1, data=data)
+
+
+def test_load_model_missing_file_raises_clear_error():
+    """load_model() on a non-existent path should fail with a clear,
+    actionable FileNotFoundError rather than a raw OS-level traceback."""
+    missing_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "no_such_model.joblib"
+    )
+    assert not os.path.exists(missing_path)
+
+    with pytest.raises(FileNotFoundError) as exc_info:
+        load_model(missing_path)
+
+    # The message should point the user at the fix, not just say "not found".
+    assert "train.py" in str(exc_info.value)
